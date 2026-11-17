@@ -144,7 +144,7 @@ Reglas:
 
 - **Build time only.** El navegador nunca llama a la Content API.
 - Si `CMS_USE_MOCKS=true`, el cliente devuelve los datos de `src/data/mock/`.
-- Si `CMS_USE_MOCKS=true` y el entorno es producción, el build debe abortar.
+- Si `CMS_USE_MOCKS=true` y el entorno es producción, el build se completa con un warning y sirve los mocks. Es una excepción temporal mientras el CMS no está desplegado (ver §15); al integrar la Content API debe configurarse `CMS_USE_MOCKS=false`.
 - Si la API falla en producción, el build falla y Vercel mantiene el deploy anterior.
 - Los errores de validación Zod deben ser claros: indicar endpoint, campo y valor recibido.
 - No hacer `fetch` dentro de componentes de UI; solo en `lib/cms/queries.ts`.
@@ -644,8 +644,9 @@ GITHUB_TOKEN=
 ```
 
 - `.env` en `.gitignore`.
-- En Vercel, configurar por entorno.
-- `CMS_USE_MOCKS=true` solo en local.
+- En Vercel, configurar por entorno. Las variables llegan al build como `process.env`, no desde `.env`.
+- `CMS_USE_MOCKS=true` en local. En Vercel se permite temporalmente en Preview y Production mientras el CMS no esté desplegado; el build emite un warning. Al integrar la Content API, configurar `CMS_API_URL`, `CMS_API_TOKEN` y `CMS_USE_MOCKS=false`.
+- Los flags (`CMS_USE_MOCKS`, `METRICS_DEBUG`) se leen con `isEnvFlagEnabled` porque Astro inlinea `true`/`false` de `process.env` como booleanos, no como strings.
 
 ## 16. Build y deploy
 
@@ -659,6 +660,7 @@ GITHUB_TOKEN=
 - Dominio: `ryuheirg.dev` y `www` redirigido.
 - Deploy Hook para el webhook.
 - Preview deployments para ramas.
+- Variables en Vercel: `PUBLIC_SITE_URL` y, mientras el CMS no exista, `CMS_USE_MOCKS=true`. No se commitea `.env`.
 
 ### Flujo
 
