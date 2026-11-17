@@ -1,0 +1,120 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getSiteSettings, getTags } from "@/lib/cms/queries";
+import { collectionJsonLd } from "@/lib/jsonld";
+
+const [tags, site] = await Promise.all([getTags(), getSiteSettings()]);
+const description = "Todas las etiquetas de la bitácora: temas, tecnologías y decisiones.";
+const jsonLd = collectionJsonLd("Etiquetas", description, new URL("/etiquetas", site.url).toString());
+---
+
+<BaseLayout
+  title="Etiquetas"
+  description={description}
+  canonicalPath="/etiquetas"
+  ogImage="/og/etiquetas.png"
+  jsonLd={[jsonLd]}
+>
+  <div class="shell">
+    <header class="page-head">
+      <p class="page-kicker">Karasu / Índice</p>
+      <div class="page-head__row">
+        <div>
+          <h1 class="page-title">Etiquetas</h1>
+          <p class="page-lede">{description}</p>
+        </div>
+        <a class="link-arrow" href="/blog">Volver al blog</a>
+      </div>
+    </header>
+
+    <ul class="tags-index">
+      {
+        tags.map((tag, index) => (
+          <li class="tags-index__item">
+            <span class="tags-index__number">{String(index + 1).padStart(2, "0")}</span>
+            <div class="tags-index__body">
+              <h2 class="tags-index__name">
+                <a href={`/etiquetas/${tag.slug}`}>{tag.name}</a>
+              </h2>
+              {tag.description && <p class="tags-index__description">{tag.description}</p>}
+            </div>
+            <span class="tags-index__count">
+              {tag.post_count ?? 0} {tag.post_count === 1 ? "post" : "posts"}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .tags-index {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .tags-index__item {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding-block: 1.35rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .tags-index__number {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    color: var(--color-red-bright);
+  }
+
+  .tags-index__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .tags-index__name {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.15rem);
+    font-weight: 400;
+    line-height: 1.05;
+  }
+
+  .tags-index__name a {
+    transition: color 180ms ease-out;
+  }
+
+  .tags-index__name a:hover {
+    color: var(--color-red-bright);
+  }
+
+  .tags-index__description {
+    max-width: 52ch;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+
+  .tags-index__count {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  @media (max-width: 600px) {
+    .tags-index__item {
+      grid-template-columns: 2rem minmax(0, 1fr);
+    }
+
+    .tags-index__count {
+      grid-column: 2;
+    }
+  }
+</style>

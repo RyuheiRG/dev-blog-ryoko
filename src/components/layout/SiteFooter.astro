@@ -1,0 +1,254 @@
+---
+import CrowMark from "@/components/ui/CrowMark.astro";
+import Icon from "@/components/ui/Icon.astro";
+import type { SiteSettings } from "@/data/schemas";
+
+interface Props {
+  site: SiteSettings;
+  email?: string;
+  hideContact?: boolean;
+}
+
+const { site, email = "hola@ryuheirg.dev", hideContact = false } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class:list={["site-footer", "grain", hideContact && "site-footer--compact"]}>
+  <div class="site-footer__inner shell">
+    {!hideContact && (
+      <div class="footer-cta">
+        <p class="eyebrow eyebrow--red">05 / Contacto</p>
+        <a class="footer-email" href={`mailto:${email}`}>
+          <span>Hablemos</span>
+          <Icon name="arrow-up-right" size={34} />
+        </a>
+        <p class="footer-cta__note">
+          ¿Tienes una idea, una pregunta o una oportunidad? Escríbeme a
+          <a class="link" href={`mailto:${email}`}>
+            {email}
+          </a>
+          .
+        </p>
+      </div>
+    )}
+
+    <div class="footer-grid">
+      <div class="footer-col">
+        <p class="footer-label">Navegación</p>
+        <ul>
+          {site.nav.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <p class="footer-label">Redes</p>
+        <ul>
+          {site.socials.map((social) => (
+            <li>
+              <a
+                href={social.url}
+                target={social.url.startsWith("http") ? "_blank" : undefined}
+                rel={social.url.startsWith("http") ? "noopener noreferrer" : undefined}
+              >
+                {social.label}
+                {social.url.startsWith("http") && <Icon name="arrow-up-right" size={12} />}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col--note">
+        <CrowMark size={40} class="footer-crow" />
+        <p>Construido con intención.</p>
+        <p class="footer-col__muted">Astro, FastAPI y un CMS propio.</p>
+      </div>
+    </div>
+
+    <div class="footer-base">
+      <p>© {year} Ricardo Reyes Gómez</p>
+      <p class="footer-base__motto">Don't trust, verify.</p>
+      <p>Hecho en Chiapas, México.</p>
+    </div>
+  </div>
+
+  <div class="footer-wordmark" aria-hidden="true">
+    RYOKO
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid var(--color-line);
+    background:
+      radial-gradient(circle at 85% 15%, rgba(193, 18, 31, 0.09), transparent 45%), var(--color-ink);
+  }
+
+  .site-footer__inner {
+    position: relative;
+    z-index: 2;
+    padding-block: clamp(3.5rem, 8vw, 6rem) 2rem;
+  }
+
+  .site-footer--compact .site-footer__inner {
+    padding-top: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .footer-cta {
+    padding-bottom: clamp(3rem, 7vw, 5rem);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .footer-email {
+    display: inline-flex;
+    align-items: baseline;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 10vw, 7rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--color-bone);
+    transition: color 200ms ease-out;
+  }
+
+  .footer-email svg {
+    color: var(--color-red);
+    align-self: flex-start;
+    margin-top: 0.2em;
+    transition: transform 250ms var(--ease-soft);
+  }
+
+  .footer-email:hover {
+    color: var(--color-red-bright);
+  }
+
+  .footer-email:hover svg {
+    transform: translate(4px, -4px);
+  }
+
+  .footer-cta__note {
+    max-width: 46ch;
+    margin-top: 1.25rem;
+    color: var(--color-muted);
+    font-size: 0.9375rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr;
+    gap: 2rem;
+    padding-block: 2.5rem;
+  }
+
+  .footer-label {
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .footer-col ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .footer-col li a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    transition: color 150ms ease-out;
+  }
+
+  .footer-col li a:hover {
+    color: var(--color-red-bright);
+  }
+
+  .footer-col--note {
+    justify-self: end;
+    max-width: 32ch;
+    text-align: right;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  .footer-crow {
+    margin-left: auto;
+    margin-bottom: 1rem;
+    color: var(--color-bone);
+  }
+
+  .footer-col__muted {
+    color: var(--color-faint);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    margin-top: 0.35rem;
+  }
+
+  .footer-base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .footer-base__motto {
+    color: var(--color-red-bright);
+  }
+
+  .footer-wordmark {
+    position: relative;
+    z-index: 1;
+    margin-top: -1.5rem;
+    font-family: var(--font-display);
+    font-size: clamp(6rem, 24vw, 22rem);
+    line-height: 0.72;
+    letter-spacing: -0.06em;
+    text-align: center;
+    color: color-mix(in srgb, var(--color-bone) 4%, transparent);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  @media (max-width: 720px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .footer-col--note {
+      grid-column: 1 / -1;
+      justify-self: start;
+      text-align: left;
+    }
+
+    .footer-crow {
+      margin-left: 0;
+    }
+
+    .footer-base {
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+  }
+</style>

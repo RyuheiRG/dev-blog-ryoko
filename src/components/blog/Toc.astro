@@ -1,0 +1,127 @@
+---
+import type { TocItem } from "@/lib/markdown";
+
+interface Props {
+  items: TocItem[];
+}
+
+const { items } = Astro.props;
+const topLevel = items.filter((item) => item.depth === 2);
+const hasItems = items.length > 0;
+---
+
+{
+  hasItems && (
+    <details class="toc" open data-toc>
+      <summary class="toc__summary">
+        <span>En este post</span>
+        <span class="toc__count">{String(topLevel.length).padStart(2, "0")}</span>
+      </summary>
+      <nav class="toc__nav" aria-label="Tabla de contenido">
+        <ol class="toc__list">
+          {items.map((item) => (
+            <li class:list={["toc__item", item.depth === 3 && "toc__item--sub"]}>
+              <a href={`#${item.id}`}>{item.text}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </details>
+  )
+}
+
+<style>
+  .toc {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
+    align-self: start;
+  }
+
+  .toc__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .toc__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .toc__count {
+    color: var(--color-red-bright);
+  }
+
+  .toc__nav {
+    padding-top: 0.85rem;
+  }
+
+  .toc__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .toc__item a {
+    display: block;
+    padding-block: 0.2rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--color-muted);
+    transition: color 150ms ease-out;
+  }
+
+  .toc__item--sub {
+    padding-left: 0.9rem;
+  }
+
+  .toc__item--sub a {
+    font-size: 0.75rem;
+    color: var(--color-faint);
+  }
+
+  .toc__item a:hover,
+  .toc__item a.is-active {
+    color: var(--color-red-bright);
+  }
+
+  .toc__item a.is-active {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 960px) {
+    .toc {
+      position: static;
+      margin-bottom: 2rem;
+      border: 1px solid var(--color-line);
+      background: var(--color-surface);
+    }
+
+    .toc__summary {
+      padding: 0.9rem 1rem;
+      border-bottom: 0;
+    }
+
+    .toc[open] .toc__summary {
+      border-bottom: 1px solid var(--color-line);
+    }
+
+    .toc__nav {
+      padding: 0.85rem 1rem 1rem;
+    }
+  }
+</style>

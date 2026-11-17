@@ -1,0 +1,195 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import NextProject from "@/components/projects/NextProject.astro";
+import ProjectCover from "@/components/projects/ProjectCover.astro";
+import ProjectFacts from "@/components/projects/ProjectFacts.astro";
+import ProjectGallery from "@/components/projects/ProjectGallery.astro";
+import StatusBadge from "@/components/ui/StatusBadge.astro";
+import Icon from "@/components/ui/Icon.astro";
+import type { ProjectSummary } from "@/data/schemas";
+import { getAllProjects, getProjectBySlug, getSiteSettings } from "@/lib/cms/queries";
+import { breadcrumbJsonLd, projectJsonLd } from "@/lib/jsonld";
+import { renderMarkdown } from "@/lib/markdown";
+
+export async function getStaticPaths() {
+  const projects = await getAllProjects();
+  return projects.map((project) => ({ params: { slug: project.slug } }));
+}
+
+const slug = Astro.params.slug ?? "";
+const [project, projects, site] = await Promise.all([
+  getProjectBySlug(slug),
+  getAllProjects(),
+  getSiteSettings(),
+]);
+
+const html = await renderMarkdown(project.case_study_md);
+const description = project.seo.description ?? project.summary;
+const canonical = `/proyectos/${project.slug}`;
+const url = new URL(canonical, site.url).toString();
+
+const index = projects.findIndex((item) => item.slug === project.slug);
+const next: ProjectSummary | null =
+  projects.length > 0 ? projects[(index + 1) % projects.length] ?? projects[0] ?? null : null;
+
+const gallery = project.gallery.filter((item) => item.id !== project.cover?.id);
+
+const jsonLd = [
+  projectJsonLd(project, url, site),
+  breadcrumbJsonLd([
+    { name: "Inicio", url: new URL("/", site.url).toString() },
+    { name: "Proyectos", url: new URL("/proyectos", site.url).toString() },
+    { name: project.title, url },
+  ]),
+];
+---
+
+<BaseLayout
+  title={project.seo.title ?? project.title}
+  description={description}
+  canonicalPath={canonical}
+  ogImage={`/og/proyectos/${project.slug}.png`}
+  type="article"
+  modifiedTime={project.updated_at}
+  tags={project.stack}
+  jsonLd={jsonLd}
+>
+  <div class="shell">
+    <nav class="breadcrumb project-breadcrumb" aria-label="Ruta de navegación">
+      <a href="/proyectos">Proyectos</a>
+      <span class="breadcrumb__sep" aria-hidden="true">/</span>
+      <span aria-current="page">{project.title}</span>
+    </nav>
+
+    <header class="project-head">
+      <div class="project-head__top">
+        <p class="page-kicker">Proyecto / {project.year}</p>
+        <StatusBadge status={project.lifecycle_status} />
+      </div>
+
+      <h1 class="project-title">{project.title}</h1>
+      <p class="project-summary">{project.summary}</p>
+
+      <div class="project-head__actions">
+        {
+          project.repo_url && (
+            <a class="btn btn--secondary" href={project.repo_url} target="_blank" rel="noopener noreferrer">
+              <Icon name="github" size={16} />
+              Repositorio
+            </a>
+          )
+        }
+        {
+          project.demo_url && (
+            <a class="btn btn--primary" href={project.demo_url} target="_blank" rel="noopener noreferrer">
+              Ver demo
+              <Icon name="arrow-up-right" size={16} />
+            </a>
+          )
+        }
+      </div>
+    </header>
+
+    <div class="project-cover">
+      <ProjectCover project={project} index={index + 1} priority />
+    </div>
+
+    {
+      !project.cover && (
+        <p class="cover-pending">
+          <span aria-hidden="true">●</span>
+          Portada pendiente: este proyecto todavía no tiene capturas. El case study está completo.
+        </p>
+      )
+    }
+
+    <ProjectFacts project={project} />
+
+    <div class="case-layout">
+      <article class="prose" set:html={html} />
+    </div>
+
+    <ProjectGallery gallery={gallery} title={project.title} />
+
+    {next && <NextProject project={next} />}
+  </div>
+</BaseLayout>
+
+<style>
+  .project-breadcrumb {
+    padding-top: 1.75rem;
+  }
+
+  .project-breadcrumb span:last-child {
+    color: var(--color-muted);
+  }
+
+  .project-head {
+    padding-block: clamp(2rem, 4.5vw, 3.5rem);
+  }
+
+  .project-head__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .project-title {
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-size: clamp(3.4rem, 10vw, 8rem);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    color: var(--color-bone);
+    text-wrap: balance;
+  }
+
+  .project-summary {
+    max-width: 58ch;
+    margin-top: 1.25rem;
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .project-head__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.75rem;
+  }
+
+  .project-cover {
+    margin-bottom: 0.85rem;
+  }
+
+  .project-cover :global(.project-cover__frame) {
+    border-color: var(--color-line-strong);
+  }
+
+  .cover-pending {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    line-height: 1.6;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-red-bright);
+  }
+
+  .cover-pending span {
+    flex: 0 0 auto;
+    margin-top: 0.2rem;
+    font-size: 0.5rem;
+  }
+
+  .case-layout {
+    padding-top: clamp(2.5rem, 5vw, 4rem);
+  }
+</style>

@@ -1,0 +1,87 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Pagination from "@/components/blog/Pagination.astro";
+import PostRow from "@/components/blog/PostRow.astro";
+import TagFilter from "@/components/blog/TagFilter.astro";
+import type { PostSummary } from "@/data/schemas";
+import { getPosts, getTags } from "@/lib/cms/queries";
+import { blogJsonLd } from "@/lib/jsonld";
+
+export async function getStaticPaths() {
+  const first = await getPosts({ page: 1, limit: 10 });
+  const paths = [];
+
+  for (let page = 2; page <= first.meta.total_pages; page += 1) {
+    const result = await getPosts({ page, limit: 10 });
+    paths.push({
+      params: { page: String(page) },
+      props: {
+        posts: result.data,
+        page: result.meta.page,
+        totalPages: result.meta.total_pages,
+      },
+    });
+  }
+
+  return paths;
+}
+
+interface Props {
+  posts: PostSummary[];
+  page: number;
+  totalPages: number;
+}
+
+const { posts, page, totalPages } = Astro.props;
+const tags = await getTags();
+const description =
+  "Notas técnicas, decisiones de arquitectura y cosas que aprendo mientras construyo.";
+const jsonLd = blogJsonLd(
+  `Karasu / Bitácora — página ${page}`,
+  description,
+  new URL(`/blog/page/${page}`, Astro.site ?? "https://ryuheirg.dev").toString(),
+);
+---
+
+<BaseLayout
+  title={`Bitácora — página ${page}`}
+  description={description}
+  canonicalPath={`/blog/page/${page}`}
+  ogImage="/og/blog.png"
+  jsonLd={[jsonLd]}
+>
+  <div class="shell">
+    <header class="page-head">
+      <p class="page-kicker">Karasu / Bitácora</p>
+      <div class="page-head__row">
+        <div>
+          <h1 class="page-title">Bitácora</h1>
+          <p class="page-lede">{description}</p>
+        </div>
+        <p class="page-number">Página {String(page).padStart(2, "0")}</p>
+      </div>
+    </header>
+
+    <TagFilter tags={tags} />
+
+    <div class="blog-list">
+      {posts.map((post) => <PostRow post={post} />)}
+    </div>
+
+    <Pagination page={page} totalPages={totalPages} />
+  </div>
+</BaseLayout>
+
+<style>
+  .blog-list {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .page-number {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+</style>

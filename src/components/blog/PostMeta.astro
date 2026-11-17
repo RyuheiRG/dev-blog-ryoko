@@ -1,0 +1,63 @@
+---
+import type { PostSummary } from "@/data/schemas";
+import { formatDate, formatNumericDate } from "@/lib/dates";
+
+interface Props {
+  post: PostSummary;
+  variant?: "long" | "numeric";
+  showTags?: boolean;
+  class?: string;
+}
+
+const { post, variant = "long", showTags = false, class: className } = Astro.props;
+const date = variant === "numeric" ? formatNumericDate(post.published_at) : formatDate(post.published_at);
+---
+
+<div class:list={["post-meta", className]}>
+  <time datetime={post.published_at}>{date}</time>
+  <span class="post-meta__sep" aria-hidden="true">·</span>
+  <span>{post.reading_time_minutes} min de lectura</span>
+  {
+    showTags && post.tags.length > 0 && (
+      <>
+        <span class="post-meta__sep" aria-hidden="true">·</span>
+        <span class="post-meta__tags">
+          {post.tags.map((tag, index) => (
+            <>
+              {index > 0 && <span aria-hidden="true">, </span>}
+              <a href={`/etiquetas/${tag.slug}`}>{tag.name}</a>
+            </>
+          ))}
+        </span>
+      </>
+    )
+  }
+</div>
+
+<style>
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    line-height: 1.5;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .post-meta__sep {
+    color: var(--color-line-strong);
+  }
+
+  .post-meta__tags a {
+    color: var(--color-muted);
+    transition: color 150ms ease-out;
+  }
+
+  .post-meta__tags a:hover {
+    color: var(--color-red-bright);
+  }
+</style>

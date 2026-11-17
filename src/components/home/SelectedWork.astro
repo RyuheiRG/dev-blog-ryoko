@@ -1,0 +1,66 @@
+---
+import type { ProjectSummary } from "@/data/schemas";
+import ProjectRow from "@/components/projects/ProjectRow.astro";
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+import Icon from "@/components/ui/Icon.astro";
+
+interface Props {
+  projects: ProjectSummary[];
+}
+
+const { projects } = Astro.props;
+---
+
+<section class="section selected-work" id="trabajo">
+  <div class="shell">
+    <div class="selected-work__head">
+      <SectionLabel number="02" label="Trabajo seleccionado" />
+      <div class="selected-work__intro">
+        <p>
+          Tres proyectos, tres problemas distintos. Cada uno con su contexto, sus decisiones y
+          lo que haría diferente.
+        </p>
+        <a class="link-arrow" href="/proyectos">
+          Todos los proyectos
+          <Icon name="arrow-up-right" size={15} />
+        </a>
+      </div>
+    </div>
+
+    <div class="selected-work__list">
+      {projects.map((project, index) => <ProjectRow project={project} index={index + 1} />)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .selected-work {
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .selected-work__head {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: 2rem;
+    align-items: start;
+    margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  .selected-work__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 52ch;
+    color: var(--color-muted);
+  }
+
+  .selected-work__list {
+    border-top: 1px solid var(--color-line);
+  }
+
+  @media (max-width: 800px) {
+    .selected-work__head {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

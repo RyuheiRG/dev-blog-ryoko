@@ -1,0 +1,22 @@
+---
+import type { Tag } from "@/data/schemas";
+
+interface Props {
+  tag: Tag;
+  active?: boolean;
+  link?: boolean;
+}
+
+const { tag, active = false, link = true } = Astro.props;
+const className = `tag${active ? " tag--active" : ""}`;
+---
+
+{
+  link ? (
+    <a href={`/etiquetas/${tag.slug}`} class={className}>
+      {tag.name}
+    </a>
+  ) : (
+    <span class={className}>{tag.name}</span>
+  )
+}

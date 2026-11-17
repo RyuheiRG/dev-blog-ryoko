@@ -1,0 +1,86 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PostRow from "@/components/blog/PostRow.astro";
+import TagFilter from "@/components/blog/TagFilter.astro";
+import { getSiteSettings, getTagBySlug, getTags } from "@/lib/cms/queries";
+import { collectionJsonLd } from "@/lib/jsonld";
+
+export async function getStaticPaths() {
+  const tags = await getTags();
+  return tags.map((tag) => ({ params: { slug: tag.slug } }));
+}
+
+const slug = Astro.params.slug ?? "";
+const [{ tag, posts }, tags, site] = await Promise.all([
+  getTagBySlug(slug),
+  getTags(),
+  getSiteSettings(),
+]);
+
+const description =
+  tag.description ?? `Posts de la bitácora etiquetados con ${tag.name}.`;
+const canonical = `/etiquetas/${tag.slug}`;
+const jsonLd = collectionJsonLd(
+  `Etiqueta / ${tag.name}`,
+  description,
+  new URL(canonical, site.url).toString(),
+);
+---
+
+<BaseLayout
+  title={`Etiqueta / ${tag.name}`}
+  description={description}
+  canonicalPath={canonical}
+  ogImage={`/og/etiquetas/${tag.slug}.png`}
+  jsonLd={[jsonLd]}
+>
+  <div class="shell">
+    <header class="page-head">
+      <p class="page-kicker">Etiqueta / {String(tag.post_count ?? posts.length).padStart(2, "0")}</p>
+      <div class="page-head__row">
+        <div>
+          <h1 class="page-title">{tag.name}</h1>
+          <p class="page-lede">{description}</p>
+        </div>
+        <a class="link-arrow" href="/etiquetas">Todas las etiquetas</a>
+      </div>
+    </header>
+
+    <TagFilter tags={tags} active={tag.slug} />
+
+    {
+      posts.length === 0 ? (
+        <div class="tag-empty">
+          <p class="tag-empty__title">Todavía no hay posts con este tag.</p>
+          <a class="link-arrow" href="/blog">Volver al blog</a>
+        </div>
+      ) : (
+        <div class="tag-posts">
+          {posts.map((post) => (
+            <PostRow post={post} />
+          ))}
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .tag-posts {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .tag-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding-block: clamp(3rem, 7vw, 5rem);
+  }
+
+  .tag-empty__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    line-height: 1.1;
+  }
+</style>

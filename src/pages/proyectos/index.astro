@@ -1,0 +1,56 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ProjectRow from "@/components/projects/ProjectRow.astro";
+import { getProjects, getSiteSettings } from "@/lib/cms/queries";
+import { collectionJsonLd } from "@/lib/jsonld";
+
+const [projects, site] = await Promise.all([getProjects({ page: 1, limit: 20 }), getSiteSettings()]);
+const description =
+  "Sistemas que he construido, con el contexto y las decisiones detrás.";
+
+const jsonLd = collectionJsonLd(
+  "Trabajo / Proyectos",
+  description,
+  new URL("/proyectos", site.url).toString(),
+);
+---
+
+<BaseLayout
+  title="Trabajo / Proyectos"
+  description={description}
+  canonicalPath="/proyectos"
+  ogImage="/og/proyectos.png"
+  jsonLd={[jsonLd]}
+>
+  <div class="shell">
+    <header class="page-head">
+      <p class="page-kicker">Trabajo / Proyectos</p>
+      <div class="page-head__row">
+        <div>
+          <h1 class="page-title">Proyectos</h1>
+          <p class="page-lede">{description}</p>
+        </div>
+        <p class="page-count">{String(projects.meta.total).padStart(2, "0")} proyectos</p>
+      </div>
+    </header>
+
+    <div class="projects-list">
+      {projects.data.map((project, index) => <ProjectRow project={project} index={index + 1} />)}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .projects-list {
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .page-count {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+</style>

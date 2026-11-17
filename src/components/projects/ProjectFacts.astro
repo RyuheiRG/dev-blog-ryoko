@@ -1,0 +1,124 @@
+---
+import StatusBadge from "@/components/ui/StatusBadge.astro";
+import Icon from "@/components/ui/Icon.astro";
+import type { Project } from "@/data/schemas";
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<section class="project-facts" aria-label="Ficha del proyecto">
+  <dl class="project-facts__grid">
+    <div class="project-facts__item">
+      <dt>Rol</dt>
+      <dd>{project.role ?? "No definido"}</dd>
+    </div>
+
+    <div class="project-facts__item">
+      <dt>Equipo</dt>
+      <dd>{project.team.length > 0 ? project.team.join(", ") : "Individual"}</dd>
+    </div>
+
+    <div class="project-facts__item">
+      <dt>Stack</dt>
+      <dd>{project.stack.join(" · ")}</dd>
+    </div>
+
+    <div class="project-facts__item">
+      <dt>Estado</dt>
+      <dd><StatusBadge status={project.lifecycle_status} /></dd>
+    </div>
+
+    <div class="project-facts__item">
+      <dt>Año</dt>
+      <dd>{project.year}</dd>
+    </div>
+
+    <div class="project-facts__item">
+      <dt>Repositorio</dt>
+      <dd>
+        {
+          project.repo_url ? (
+            <a class="link-arrow" href={project.repo_url} target="_blank" rel="noopener noreferrer">
+              GitHub
+              <Icon name="arrow-up-right" size={13} />
+            </a>
+          ) : (
+            <span class="faint">Privado</span>
+          )
+        }
+      </dd>
+    </div>
+
+    <div class="project-facts__item">
+      <dt>Demo</dt>
+      <dd>
+        {
+          project.demo_url ? (
+            <a class="link-arrow" href={project.demo_url} target="_blank" rel="noopener noreferrer">
+              Abrir sitio
+              <Icon name="arrow-up-right" size={13} />
+            </a>
+          ) : (
+            <span class="faint">No disponible</span>
+          )
+        }
+      </dd>
+    </div>
+  </dl>
+</section>
+
+<style>
+  .project-facts {
+    padding-block: clamp(1.75rem, 4vw, 2.75rem);
+    border-block: 1px solid var(--color-line);
+  }
+
+  .project-facts__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.5rem 2rem;
+    margin: 0;
+  }
+
+  .project-facts__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .project-facts__item dt {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .project-facts__item dd {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-bone);
+  }
+
+  .project-facts__item dd :global(.status) {
+    font-size: 0.625rem;
+  }
+
+  @media (max-width: 900px) {
+    .project-facts__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 480px) {
+    .project-facts__grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+</style>

@@ -1,0 +1,107 @@
+---
+import type { ImageMetadata } from "astro";
+
+import SmartImage from "@/components/ui/SmartImage.astro";
+import type { Media } from "@/data/schemas";
+import { mediaSource } from "@/lib/media";
+
+interface Props {
+  gallery: Media[];
+  title: string;
+}
+
+const { gallery, title } = Astro.props;
+const items: { media: Media; src: ImageMetadata | string }[] = [];
+
+for (const media of gallery) {
+  const src = mediaSource(media);
+  if (src) {
+    items.push({ media, src });
+  }
+}
+---
+
+{
+  items.length > 0 && (
+    <section class="gallery">
+      <h2 class="gallery__title">Galería</h2>
+      <div class="gallery__grid">
+        {items.map(({ media, src }, index) => (
+          <figure class="gallery__item">
+            <SmartImage
+              src={src}
+              alt={media.alt}
+              width={media.width}
+              height={media.height}
+              widths={[480, 800, 1200]}
+              sizes="(max-width: 800px) 100vw, 50vw"
+              format="avif"
+              quality={82}
+              loading="lazy"
+            />
+            <figcaption>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <span>{title}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .gallery {
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding-top: clamp(2rem, 4vw, 3rem);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .gallery__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  .gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .gallery__item {
+    margin: 0;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+
+  .gallery__item :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  .gallery__item figcaption {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.65rem 0.75rem;
+    border-top: 1px solid var(--color-line);
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .gallery__item figcaption span:first-child {
+    color: var(--color-red-bright);
+  }
+
+  @media (max-width: 700px) {
+    .gallery__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

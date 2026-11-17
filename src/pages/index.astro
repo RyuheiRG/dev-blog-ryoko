@@ -1,0 +1,27 @@
+---
+import AboutStrip from "@/components/home/AboutStrip.astro";
+import LatestPosts from "@/components/home/LatestPosts.astro";
+import SelectedWork from "@/components/home/SelectedWork.astro";
+import Statement from "@/components/home/Statement.astro";
+import Hero from "@/components/hero/Hero.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getLanding, getPosts, getProjects, getSiteSettings } from "@/lib/cms/queries";
+import { personJsonLd, websiteJsonLd } from "@/lib/jsonld";
+
+const [landing, posts, projects, site] = await Promise.all([
+  getLanding(),
+  getPosts({ page: 1, limit: 3 }),
+  getProjects({ page: 1, limit: 3, featured: true }),
+  getSiteSettings(),
+]);
+
+const jsonLd = [websiteJsonLd(site), personJsonLd(site)];
+---
+
+<BaseLayout headerTransparent jsonLd={jsonLd}>
+  <Hero hero={landing.hero} />
+  <Statement about={landing.about} />
+  <SelectedWork projects={projects.data} />
+  <LatestPosts posts={posts.data} />
+  <AboutStrip about={landing.about} />
+</BaseLayout>

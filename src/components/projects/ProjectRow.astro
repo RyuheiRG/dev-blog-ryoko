@@ -1,0 +1,142 @@
+---
+import type { ProjectSummary } from "@/data/schemas";
+import ProjectCover from "@/components/projects/ProjectCover.astro";
+import StatusBadge from "@/components/ui/StatusBadge.astro";
+import Icon from "@/components/ui/Icon.astro";
+interface Props {
+  project: ProjectSummary;
+  index: number;
+}
+
+const { project, index } = Astro.props;
+const padded = String(index).padStart(2, "0");
+const href = `/proyectos/${project.slug}`;
+---
+
+<article class="project-row reveal">
+  <span class="project-row__index" aria-hidden="true">
+    {padded}
+  </span>
+
+  <div class="project-row__body">
+    <StatusBadge status={project.lifecycle_status} />
+    <h3 class="project-row__title">
+      <a href={href}>{project.title}</a>
+    </h3>
+    <p class="project-row__summary">{project.summary}</p>
+
+    <ul class="project-row__tags" aria-label={`Stack de ${project.title}`}>
+      {project.stack.map((item) => (
+        <li>
+          <span class="tag">{item}</span>
+        </li>
+      ))}
+    </ul>
+
+    <a class="link-arrow" href={href}>
+      Ver case study
+      <Icon name="arrow-up-right" size={15} />
+    </a>
+  </div>
+
+  <a class="project-row__media" href={href} tabindex="-1" aria-hidden="true">
+    <ProjectCover project={project} index={index} class="project-cover--row" />
+  </a>
+</article>
+
+<style>
+  .project-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    padding-block: clamp(2rem, 4vw, 3.25rem);
+    border-bottom: 1px solid var(--color-line);
+    align-items: center;
+  }
+
+  .project-row__index {
+    align-self: start;
+    padding-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--color-red-bright);
+  }
+
+  .project-row__body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .project-row__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .project-row__title a {
+    transition: color 180ms ease-out;
+  }
+
+  .project-row__title a:hover {
+    color: var(--color-red-bright);
+  }
+
+  .project-row__summary {
+    max-width: 42ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .project-row__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .project-row__media {
+    display: block;
+    overflow: hidden;
+  }
+
+  .project-row__media :global(.project-cover) {
+    transition: transform 350ms var(--ease-out-expo);
+  }
+
+  .project-row__media:hover :global(.project-cover) {
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 900px) {
+    .project-row {
+      grid-template-columns: 2rem minmax(0, 1fr);
+    }
+
+    .project-row__media {
+      grid-column: 2;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .project-row {
+      grid-template-columns: 1fr;
+    }
+
+    .project-row__index {
+      padding-top: 0;
+    }
+
+    .project-row__media {
+      grid-column: 1;
+    }
+  }
+</style>

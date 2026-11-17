@@ -1,0 +1,43 @@
+@theme {
+  /* Color */
+  --color-ink: #090a0c;
+  --color-surface: #111316;
+  --color-surface-2: #17191d;
+  --color-bone: #f2f1ef;
+  --color-muted: #a5a6a8;
+  --color-faint: #6f7175;
+  --color-line: #2b2d31;
+  --color-line-strong: #3a3d42;
+  --color-crimson: #c1121f;
+  --color-red: #f04452;
+  --color-red-bright: #ff6b76;
+  --color-red-deep: #7a0c14;
+  --color-success: #3ddc97;
+  --color-warning: #f5b942;
+
+  /* Type */
+  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, Consolas, monospace;
+
+  /* Layout */
+  --container-site: 1200px;
+  --container-narrow: 880px;
+  --container-prose: 720px;
+  --gutter: clamp(1.25rem, 5vw, 2.5rem);
+  --section-y: clamp(4.5rem, 10vw, 8rem);
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:root {
+  color-scheme: dark;
+  --header-h: 68px;
+  --grid-line: color-mix(in srgb, var(--color-bone) 4%, transparent);
+  --paper-bg: #f7f4ee;
+  --paper-ink: #151515;
+  --paper-muted: #5f5f5f;
+  --paper-line: #ded9cf;
+}

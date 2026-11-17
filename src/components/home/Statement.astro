@@ -1,0 +1,113 @@
+---
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+import type { Landing } from "@/data/schemas";
+
+interface Props {
+  about: Landing["about"];
+}
+
+const { about } = Astro.props;
+const paragraphs = about.body_md.split("\n\n").filter(Boolean);
+const facts = [
+  { label: "Ubicación", value: "Chiapas, México" },
+  { label: "Enfoque", value: "Full stack + Security" },
+  { label: "Estado", value: "4.º cuatrimestre, ITID" },
+  { label: "Disponible", value: "Prácticas y proyectos" },
+];
+---
+
+<section class="section statement" id="statement">
+  <div class="shell statement__grid">
+    <div class="statement__main reveal">
+      <SectionLabel number="01" label="Statement" />
+      <p class="statement__text">
+        Soy Ricardo Reyes Gómez. Construyo software full stack con mentalidad Zero Trust:
+        verifico cada capa, reduzco la superficie de ataque y documento las decisiones.
+      </p>
+      <p class="statement__support">
+        {paragraphs[1] ??
+          "Estudio en la UPChiapas y este es mi cuaderno de trabajo: proyectos, decisiones y notas técnicas."}
+      </p>
+    </div>
+
+    <aside class="statement__facts reveal" aria-label="Datos rápidos">
+      {facts.map((fact) => (
+        <div class="fact">
+          <span class="fact__label">{fact.label}</span>
+          <span class="fact__value">{fact.value}</span>
+        </div>
+      ))}
+    </aside>
+  </div>
+</section>
+
+<style>
+  .statement {
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .statement__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.7fr);
+    gap: clamp(2.5rem, 7vw, 6rem);
+    align-items: start;
+  }
+
+  .statement__text {
+    margin-top: 2rem;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4.6vw, 3.65rem);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    color: var(--color-bone);
+    text-wrap: balance;
+  }
+
+  .statement__support {
+    max-width: 48ch;
+    margin-top: 2rem;
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--color-red);
+    color: var(--color-muted);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .statement__facts {
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .fact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .fact__label {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .fact__value {
+    font-size: 0.9375rem;
+    color: var(--color-bone);
+  }
+
+  @media (max-width: 800px) {
+    .statement__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .statement__facts {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 1.5rem;
+    }
+  }
+</style>

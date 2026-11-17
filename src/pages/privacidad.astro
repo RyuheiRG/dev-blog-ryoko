@@ -1,0 +1,91 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const email = "hola@ryuheirg.dev";
+---
+
+<BaseLayout
+  title="Privacidad"
+  description="Qué datos recibe Ryoko, qué no recibe y cómo funciona la analítica sin cookies."
+  canonicalPath="/privacidad"
+  ogImage="/og/privacidad.png"
+>
+  <div class="shell shell--narrow">
+    <header class="page-head">
+      <p class="page-kicker">Legal / Privacidad</p>
+      <div>
+        <h1 class="page-title">Privacidad</h1>
+        <p class="page-lede">
+          La versión corta: este sitio no usa cookies, no tiene anuncios y no vende datos.
+        </p>
+      </div>
+    </header>
+
+    <article class="prose privacy">
+      <p class="privacy__date">Última actualización: 15 de noviembre de 2026</p>
+
+      <h2>Qué datos se reciben</h2>
+      <p>
+        Ryoko es un sitio estático. No hay cuentas, formularios de registro, comentarios ni
+        newsletter. Si me escribes por correo, recibo tu dirección y el contenido del mensaje;
+        eso queda en mi bandeja y no se comparte.
+      </p>
+
+      <h2>Analítica sin cookies</h2>
+      <p>
+        Para saber qué páginas se leen, el sitio envía eventos a una API propia de métricas. Los
+        eventos incluyen la ruta visitada, el tipo de evento, la fecha, el referrer y un
+        identificador de sesión temporal. No se envía tu nombre, tu correo ni un identificador
+        persistente entre sesiones.
+      </p>
+      <p>
+        El identificador de sesión vive en <code>sessionStorage</code> y desaparece al cerrar la
+        pestaña. La analítica respeta <code>Do Not Track</code> y el modo de ahorro de datos del
+        navegador: si están activos, no se envía nada.
+      </p>
+      <p>
+        No uso Google Analytics, píxeles de redes sociales ni cookies de publicidad. El sitio no
+        tiene anuncios.
+      </p>
+
+      <h2>Enlaces externos</h2>
+      <p>
+        Los enlaces a GitHub, LinkedIn y otros sitios te llevan fuera de Ryoko. Cada sitio tiene
+        sus propias prácticas de privacidad y no las controlo.
+      </p>
+
+      <h2>Infraestructura</h2>
+      <p>
+        El sitio se despliega en Vercel. Como cualquier proveedor de hosting, Vercel puede
+        registrar datos técnicos de la solicitud, como la dirección IP y el user agent, para
+        operar y proteger el servicio.
+      </p>
+
+      <h2>Cambios</h2>
+      <p>
+        Si la política cambia, actualizo esta página y la fecha de arriba. Los cambios
+        importantes se anuncian en la bitácora.
+      </p>
+
+      <h2>Contacto</h2>
+      <p>
+        Si tienes preguntas sobre privacidad, escríbeme a
+        <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .privacy {
+    padding-block: clamp(2rem, 5vw, 3.5rem) clamp(3rem, 6vw, 5rem);
+  }
+
+  .privacy__date {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+</style>

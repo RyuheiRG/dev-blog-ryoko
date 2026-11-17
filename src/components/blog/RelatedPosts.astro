@@ -1,0 +1,99 @@
+---
+import type { PostSummary } from "@/data/schemas";
+import { formatNumericDate } from "@/lib/dates";
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+
+interface Props {
+  posts: PostSummary[];
+}
+
+const { posts } = Astro.props;
+---
+
+{
+  posts.length > 0 && (
+    <section class="related section--tight">
+      <SectionLabel number="05" label="También te puede interesar" />
+      <div class="related__grid">
+        {posts.map((post) => (
+          <article class="related__item">
+            <p class="related__date">{formatNumericDate(post.published_at)}</p>
+            <h2 class="related__title">
+              <a href={`/blog/${post.slug}`}>{post.title}</a>
+            </h2>
+            <p class="related__excerpt">{post.excerpt}</p>
+            <p class="related__time">{post.reading_time_minutes} min de lectura</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .related {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding-top: clamp(2rem, 4vw, 3rem);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .related__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 2rem;
+    background: var(--color-line);
+    border: 1px solid var(--color-line);
+  }
+
+  .related__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.35rem;
+    background: var(--color-ink);
+  }
+
+  .related__date,
+  .related__time {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .related__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+
+  .related__title a {
+    transition: color 180ms ease-out;
+  }
+
+  .related__title a:hover {
+    color: var(--color-red-bright);
+  }
+
+  .related__excerpt {
+    flex: 1;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+
+  .related__time {
+    margin-top: 0.35rem;
+    color: var(--color-red-bright);
+  }
+
+  @media (max-width: 800px) {
+    .related__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

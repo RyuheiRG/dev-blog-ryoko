@@ -1,0 +1,168 @@
+---
+import type { PostSummary } from "@/data/schemas";
+import { formatNumericDate } from "@/lib/dates";
+import Icon from "@/components/ui/Icon.astro";
+
+interface Props {
+  post: PostSummary;
+}
+
+const { post } = Astro.props;
+---
+
+<article class="post-row reveal">
+  <div class="post-row__date">
+    <time datetime={post.published_at}>{formatNumericDate(post.published_at)}</time>
+  </div>
+
+  <div class="post-row__body">
+    <h3 class="post-row__title">
+      <a href={`/blog/${post.slug}`}>{post.title}</a>
+    </h3>
+    <p class="post-row__excerpt">{post.excerpt}</p>
+    {
+      post.tags.length > 0 && (
+        <p class="post-row__tags">
+          {post.tags.map((tag) => (
+            <a href={`/etiquetas/${tag.slug}`}>{tag.name}</a>
+          ))}
+        </p>
+      )
+    }
+  </div>
+
+  <div class="post-row__meta">
+    <span>{post.reading_time_minutes} min</span>
+    <a class="post-row__go" href={`/blog/${post.slug}`} aria-label={`Leer ${post.title}`}>
+      <Icon name="arrow-up-right" size={16} />
+    </a>
+  </div>
+</article>
+
+<style>
+  .post-row {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    align-items: start;
+    padding-block: clamp(1.5rem, 3.5vw, 2.4rem);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .post-row__date {
+    padding-top: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    color: var(--color-faint);
+  }
+
+  .post-row__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .post-row__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.35rem);
+    font-weight: 400;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+  }
+
+  .post-row__title a {
+    transition: color 180ms ease-out;
+  }
+
+  .post-row__title a:hover {
+    color: var(--color-red-bright);
+  }
+
+  .post-row__excerpt {
+    max-width: 64ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .post-row__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.85rem;
+    margin-top: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .post-row__tags a {
+    transition: color 150ms ease-out;
+  }
+
+  .post-row__tags a:hover {
+    color: var(--color-red-bright);
+  }
+
+  .post-row__meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .post-row__go {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-line);
+    border-radius: 2px;
+    color: var(--color-muted);
+    transition:
+      border-color 150ms ease-out,
+      color 150ms ease-out;
+  }
+
+  .post-row:hover .post-row__go {
+    border-color: var(--color-red);
+    color: var(--color-red-bright);
+  }
+
+  @media (max-width: 720px) {
+    .post-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.75rem;
+    }
+
+    .post-row__date {
+      grid-column: 1 / -1;
+      padding-top: 0;
+    }
+
+    .post-row__body {
+      grid-column: 1;
+    }
+
+    .post-row__meta {
+      grid-column: 2;
+      grid-row: 2;
+      padding-top: 0.2rem;
+    }
+
+    .post-row__meta > span {
+      display: none;
+    }
+
+    .post-row__excerpt {
+      font-size: 0.875rem;
+    }
+  }
+</style>

@@ -1,0 +1,88 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+import type { ProjectSummary } from "@/data/schemas";
+
+interface Props {
+  project: ProjectSummary;
+}
+
+const { project } = Astro.props;
+---
+
+<a class="next-project" href={`/proyectos/${project.slug}`}>
+  <span class="next-project__label">Siguiente proyecto</span>
+  <span class="next-project__row">
+    <span class="next-project__title">{project.title}</span>
+    <span class="next-project__arrow" aria-hidden="true">
+      <Icon name="arrow-right" size={24} />
+    </span>
+  </span>
+  <span class="next-project__meta">{project.stack.join(" · ")}</span>
+</a>
+
+<style>
+  .next-project {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding-top: clamp(2rem, 4vw, 3rem);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .next-project__label {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-red-bright);
+  }
+
+  .next-project__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .next-project__title {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 6vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    transition: color 180ms ease-out;
+  }
+
+  .next-project__arrow {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    flex: 0 0 auto;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 2px;
+    color: var(--color-muted);
+    transition:
+      border-color 180ms ease-out,
+      color 180ms ease-out,
+      transform 250ms var(--ease-soft);
+  }
+
+  .next-project:hover .next-project__title {
+    color: var(--color-red-bright);
+  }
+
+  .next-project:hover .next-project__arrow {
+    border-color: var(--color-red);
+    color: var(--color-red-bright);
+    transform: translateX(4px);
+  }
+
+  .next-project__meta {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+</style>

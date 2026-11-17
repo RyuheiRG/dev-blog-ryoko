@@ -1,0 +1,171 @@
+---
+import type { PostSummary } from "@/data/schemas";
+import { formatNumericDate } from "@/lib/dates";
+import SectionLabel from "@/components/ui/SectionLabel.astro";
+import Icon from "@/components/ui/Icon.astro";
+
+interface Props {
+  posts: PostSummary[];
+}
+
+const { posts } = Astro.props;
+---
+
+<section class="section latest">
+  <div class="shell">
+    <div class="latest__head">
+      <SectionLabel number="03" label="Escritos" />
+      <div class="latest__intro">
+        <p>Notas de lo que construyo, lo que rompo y lo que aprendo.</p>
+        <a class="link-arrow" href="/blog">
+          Todo el blog
+          <Icon name="arrow-up-right" size={15} />
+        </a>
+      </div>
+    </div>
+
+    <div class="latest__list">
+      {
+        posts.map((post, index) => (
+          <article class="latest__item reveal">
+            <span class="latest__index" aria-hidden="true">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <time class="latest__date" datetime={post.published_at}>
+              {formatNumericDate(post.published_at)}
+            </time>
+            <h3 class="latest__title">
+              <a href={`/blog/${post.slug}`}>{post.title}</a>
+            </h3>
+            <span class="latest__time">{post.reading_time_minutes} min</span>
+            <a
+              class="latest__go"
+              href={`/blog/${post.slug}`}
+              aria-label={`Leer ${post.title}`}
+            >
+              <Icon name="arrow-up-right" size={16} />
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .latest {
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .latest__head {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: 2rem;
+    align-items: start;
+    margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+  }
+
+  .latest__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 52ch;
+    color: var(--color-muted);
+  }
+
+  .latest__list {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .latest__item {
+    display: grid;
+    grid-template-columns: 2.5rem 7.5rem minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: clamp(0.75rem, 2.5vw, 2rem);
+    padding-block: 1.35rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .latest__index {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    color: var(--color-red-bright);
+  }
+
+  .latest__date {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    color: var(--color-faint);
+  }
+
+  .latest__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+  }
+
+  .latest__title a {
+    transition: color 180ms ease-out;
+  }
+
+  .latest__title a:hover {
+    color: var(--color-red-bright);
+  }
+
+  .latest__time {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .latest__go {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid transparent;
+    color: var(--color-muted);
+    transition:
+      border-color 150ms ease-out,
+      color 150ms ease-out;
+  }
+
+  .latest__item:hover .latest__go {
+    border-color: var(--color-red);
+    color: var(--color-red-bright);
+  }
+
+  @media (max-width: 800px) {
+    .latest__head {
+      grid-template-columns: 1fr;
+    }
+
+    .latest__item {
+      grid-template-columns: 2rem minmax(0, 1fr) auto;
+      gap: 0.75rem;
+    }
+
+    .latest__date {
+      grid-column: 2 / -1;
+    }
+
+    .latest__title {
+      grid-column: 2;
+    }
+
+    .latest__time {
+      display: none;
+    }
+
+    .latest__go {
+      grid-column: 3;
+      grid-row: 2;
+    }
+  }
+</style>

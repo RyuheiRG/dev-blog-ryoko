@@ -1,0 +1,134 @@
+---
+import CrowMark from "@/components/ui/CrowMark.astro";
+
+interface Props {
+  title: string;
+  label: string;
+  index?: string;
+  note?: string;
+  class?: string;
+}
+
+const { title, label, index = "00", note, class: className } = Astro.props;
+---
+
+<div class:list={["type-cover", "grid-lines", className]}>
+  <div class="type-cover__top">
+    <span>{label}</span>
+    <CrowMark size={20} class="type-cover__crow" />
+  </div>
+
+  <div class="type-cover__body">
+    <span class="type-cover__index" aria-hidden="true">{index}</span>
+    <h3 class="type-cover__title">{title}</h3>
+  </div>
+
+  <div class="type-cover__bottom">
+    <span>Ryoko / Karasu</span>
+    {note ? <span class="type-cover__note">{note}</span> : <span>Portada tipográfica</span>}
+  </div>
+</div>
+
+<style>
+  .type-cover {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    aspect-ratio: 16 / 10;
+    padding: clamp(1rem, 3.5vw, 2rem);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .type-cover::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: var(--color-red);
+    z-index: 2;
+  }
+
+  .type-cover::after {
+    content: "";
+    position: absolute;
+    width: 42%;
+    aspect-ratio: 1;
+    right: -12%;
+    bottom: -28%;
+    border: 1px solid color-mix(in srgb, var(--color-red) 35%, transparent);
+    border-radius: 50%;
+    z-index: -1;
+  }
+
+  .type-cover__top,
+  .type-cover__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .type-cover__crow {
+    color: var(--color-muted);
+  }
+
+  .type-cover__body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 90%;
+  }
+
+  .type-cover__index {
+    font-family: var(--font-mono);
+    font-size: clamp(0.7rem, 1.4vw, 0.85rem);
+    letter-spacing: 0.16em;
+    color: var(--color-red-bright);
+  }
+
+  .type-cover__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.55rem, 4.2vw, 3.1rem);
+    font-weight: 400;
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    color: var(--color-bone);
+    text-wrap: balance;
+  }
+
+  .type-cover__note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-red-bright);
+    text-align: right;
+  }
+
+  .type-cover__note::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--color-red);
+  }
+
+  @media (max-width: 640px) {
+    .type-cover {
+      aspect-ratio: 4 / 3;
+    }
+
+    .type-cover__bottom span:last-child {
+      max-width: 55%;
+    }
+  }
+</style>

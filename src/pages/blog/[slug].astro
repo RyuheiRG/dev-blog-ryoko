@@ -1,0 +1,334 @@
+---
+import SmartImage from "@/components/ui/SmartImage.astro";
+
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PostMeta from "@/components/blog/PostMeta.astro";
+import RelatedPosts from "@/components/blog/RelatedPosts.astro";
+import Toc from "@/components/blog/Toc.astro";
+import Icon from "@/components/ui/Icon.astro";
+import {
+  getAllPosts,
+  getPostBySlug,
+  getRelatedPosts,
+  getSiteSettings,
+} from "@/lib/cms/queries";
+import { formatDate } from "@/lib/dates";
+import { blogPostingJsonLd, breadcrumbJsonLd } from "@/lib/jsonld";
+import { extractToc, renderMarkdown } from "@/lib/markdown";
+import { mediaSource } from "@/lib/media";
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({ params: { slug: post.slug } }));
+}
+
+const slug = Astro.params.slug ?? "";
+const [post, site, related, allPosts] = await Promise.all([
+  getPostBySlug(slug),
+  getSiteSettings(),
+  getRelatedPosts(slug, 3),
+  getAllPosts(),
+]);
+
+const html = await renderMarkdown(post.content_md);
+const toc = extractToc(post.content_md);
+const coverSrc = mediaSource(post.cover);
+const title = post.seo.title ?? post.title;
+const description = post.seo.description ?? post.excerpt;
+const canonical = `/blog/${post.slug}`;
+const url = new URL(canonical, site.url).toString();
+
+const index = allPosts.findIndex((item) => item.slug === post.slug);
+const newer = index > 0 ? allPosts[index - 1] : null;
+const older = index >= 0 && index < allPosts.length - 1 ? allPosts[index + 1] : null;
+
+const jsonLd = [
+  blogPostingJsonLd(post, url, site),
+  breadcrumbJsonLd([
+    { name: "Inicio", url: new URL("/", site.url).toString() },
+    { name: "Blog", url: new URL("/blog", site.url).toString() },
+    { name: post.title, url },
+  ]),
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalPath={canonical}
+  ogImage={`/og/blog/${post.slug}.png`}
+  type="article"
+  publishedTime={post.published_at}
+  modifiedTime={post.updated_at}
+  tags={post.tags.map((tag) => tag.name)}
+  jsonLd={jsonLd}
+>
+  <div class="shell">
+    <nav class="breadcrumb post-breadcrumb" aria-label="Ruta de navegación">
+      <a href="/blog">Blog</a>
+      <span class="breadcrumb__sep" aria-hidden="true">/</span>
+      <span aria-current="page">{post.title}</span>
+    </nav>
+
+    <header class="post-head">
+      <p class="page-kicker">Karasu / Bitácora</p>
+      <h1 class="post-title">{post.title}</h1>
+      <p class="post-excerpt">{post.excerpt}</p>
+
+      <div class="post-head__meta">
+        <PostMeta post={post} showTags />
+        <button type="button" class="copy-link" data-copy-link>
+          <Icon name="copy" size={14} />
+          <span data-copy-label>Copiar link</span>
+        </button>
+      </div>
+    </header>
+
+    {
+      coverSrc && post.cover && (
+        <figure class="post-cover">
+          <SmartImage
+            src={coverSrc}
+            alt={post.cover.alt}
+            width={post.cover.width}
+            height={post.cover.height}
+            widths={[640, 960, 1200]}
+            sizes="(max-width: 900px) 100vw, 900px"
+            format="avif"
+            quality={82}
+            loading="eager"
+          />
+        </figure>
+      )
+    }
+
+    <div class="post-layout">
+      <aside class="post-aside">
+        <Toc items={toc} />
+      </aside>
+
+      <article class="prose post-body" set:html={html} />
+
+      <footer class="post-footer">
+        <div class="post-footer__share">
+          <p class="eyebrow">Fin del post / {formatDate(post.published_at)}</p>
+          <button type="button" class="btn btn--secondary" data-copy-link>
+            <Icon name="copy" size={15} />
+            <span data-copy-label>Copiar link</span>
+          </button>
+        </div>
+
+        <nav class="post-nav" aria-label="Posts anterior y siguiente">
+          {
+            newer ? (
+              <a class="post-nav__item" href={`/blog/${newer.slug}`}>
+                <span class="post-nav__label">
+                  <Icon name="arrow-left" size={13} />
+                  Más reciente
+                </span>
+                <span class="post-nav__title">{newer.title}</span>
+              </a>
+            ) : (
+              <span />
+            )
+          }
+          {
+            older ? (
+              <a class="post-nav__item post-nav__item--end" href={`/blog/${older.slug}`}>
+                <span class="post-nav__label">
+                  Anterior
+                  <Icon name="arrow-right" size={13} />
+                </span>
+                <span class="post-nav__title">{older.title}</span>
+              </a>
+            ) : (
+              <span />
+            )
+          }
+        </nav>
+      </footer>
+    </div>
+
+    <RelatedPosts posts={related} />
+  </div>
+</BaseLayout>
+
+<style>
+  .post-breadcrumb {
+    padding-top: 1.75rem;
+    padding-bottom: 0;
+  }
+
+  .post-breadcrumb span:last-child {
+    max-width: 46ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-muted);
+  }
+
+  .post-head {
+    max-width: 54rem;
+    padding-block: clamp(2rem, 4.5vw, 3.5rem);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .post-title {
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 7vw, 5.6rem);
+    font-weight: 400;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    color: var(--color-bone);
+    text-wrap: balance;
+  }
+
+  .post-excerpt {
+    max-width: 58ch;
+    margin-top: 1.25rem;
+    font-size: clamp(1.05rem, 2vw, 1.2rem);
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .post-head__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.75rem;
+  }
+
+  .copy-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 36px;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid var(--color-line);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    transition:
+      border-color 150ms ease-out,
+      color 150ms ease-out;
+  }
+
+  .copy-link:hover {
+    border-color: var(--color-red);
+    color: var(--color-red-bright);
+  }
+
+  .post-cover {
+    margin: clamp(2rem, 4vw, 3rem) 0 0;
+    border: 1px solid var(--color-line);
+  }
+
+  .post-cover :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .post-layout {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+    padding-top: clamp(2.25rem, 4.5vw, 3.5rem);
+  }
+
+  .post-aside {
+    position: relative;
+  }
+
+  .post-body {
+    min-width: 0;
+  }
+
+  .post-footer {
+    grid-column: 2;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .post-footer__share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    margin-top: 2rem;
+    background: var(--color-line);
+    border: 1px solid var(--color-line);
+  }
+
+  .post-nav__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.1rem 1.2rem;
+    background: var(--color-ink);
+    transition: background-color 150ms ease-out;
+  }
+
+  .post-nav__item:hover {
+    background: var(--color-surface);
+  }
+
+  .post-nav__item--end {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .post-nav__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-red-bright);
+  }
+
+  .post-nav__title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    line-height: 1.15;
+  }
+
+  @media (max-width: 960px) {
+    .post-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .post-footer {
+      grid-column: 1;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .post-nav__item--end {
+      text-align: left;
+      align-items: flex-start;
+    }
+  }
+</style>
