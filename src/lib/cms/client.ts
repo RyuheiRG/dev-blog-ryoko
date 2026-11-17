@@ -1,3 +1,5 @@
+import { isEnvFlagEnabled } from "@/lib/env";
+
 export class CmsError extends Error {
   status: number;
   detail?: unknown;
@@ -20,22 +22,26 @@ type FetchOptions = {
 const TIMEOUT_MS = 10_000;
 const RETRIES = 2;
 
+let warnedAboutMocksInProduction = false;
+
 function isMockMode(): boolean {
-  return import.meta.env.CMS_USE_MOCKS === "true";
-}
+  const enabled = isEnvFlagEnabled(import.meta.env.CMS_USE_MOCKS);
 
-function mockModeInProduction(): boolean {
-  return isMockMode() && import.meta.env.VERCEL_ENV === "production";
-}
-
-export async function cmsFetch<T>({ path, query, token, signal }: FetchOptions): Promise<T> {
-  if (mockModeInProduction()) {
-    throw new CmsError(
-      "CMS_USE_MOCKS=true no está permitido en producción. Configura la Content API real.",
-      500,
+  // Excepción temporal mientras el CMS no está desplegado. Cuando la Content
+  // API esté disponible, configurar CMS_API_URL, CMS_API_TOKEN y
+  // CMS_USE_MOCKS=false en Vercel.
+  if (enabled && import.meta.env.VERCEL_ENV === "production" && !warnedAboutMocksInProduction) {
+    warnedAboutMocksInProduction = true;
+    console.warn(
+      "[ryoko] CMS_USE_MOCKS=true en producción: el sitio se genera con contenido mock. " +
+        "Configura CMS_API_URL, CMS_API_TOKEN y CMS_USE_MOCKS=false cuando el CMS esté disponible.",
     );
   }
 
+  return enabled;
+}
+
+export async function cmsFetch<T>({ path, query, token, signal }: FetchOptions): Promise<T> {
   const base = import.meta.env.CMS_API_URL;
   if (!base) {
     throw new CmsError("CMS_API_URL no está definida.", 500);
@@ -70,11 +76,7 @@ export async function cmsFetch<T>({ path, query, token, signal }: FetchOptions):
           await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
           continue;
         }
-        throw new CmsError(
-          `CMS respondió ${response.status} en ${path}`,
-          response.status,
-          detail,
-        );
+        throw new CmsError(`CMS respondió ${response.status} en ${path}`, response.status, detail);
       }
 
       return (await response.json()) as T;

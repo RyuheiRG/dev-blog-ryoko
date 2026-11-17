@@ -4,10 +4,10 @@ interface ImportMetaEnv {
   readonly CMS_API_URL?: string;
   readonly CMS_API_TOKEN?: string;
   readonly CMS_PREVIEW_TOKEN?: string;
-  readonly CMS_USE_MOCKS?: string;
+  readonly CMS_USE_MOCKS?: string | boolean;
   readonly METRICS_API_URL?: string;
   readonly METRICS_SITE_KEY?: string;
-  readonly METRICS_DEBUG?: string;
+  readonly METRICS_DEBUG?: string | boolean;
   readonly PUBLIC_SITE_URL?: string;
   readonly GITHUB_TOKEN?: string;
   readonly VERCEL_ENV?: string;

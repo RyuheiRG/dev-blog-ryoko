@@ -9,6 +9,7 @@ import BaseHead from "@/components/seo/BaseHead.astro";
 import SiteFooter from "@/components/layout/SiteFooter.astro";
 import SiteHeader from "@/components/layout/SiteHeader.astro";
 import { getSiteSettings } from "@/lib/cms/queries";
+import { isEnvFlagEnabled } from "@/lib/env";
 
 interface Props {
   title?: string | null;
@@ -45,7 +46,7 @@ const {
 const site = await getSiteSettings();
 const metricsUrl = import.meta.env.METRICS_API_URL ?? "";
 const metricsKey = import.meta.env.METRICS_SITE_KEY ?? "";
-const metricsDebug = import.meta.env.METRICS_DEBUG === "true";
+const metricsDebug = isEnvFlagEnabled(import.meta.env.METRICS_DEBUG);
 ---
 
 <!doctype html>
