@@ -242,7 +242,7 @@ Vive en `apps/admin` y se despliega en `cms.ryuheirg.dev`. No forma parte del si
 
 - **Login** contra `POST /v1/auth/token`, refresh automático y logout.
 - **Dashboard**: page views, top posts, clicks de proyectos, outbound clicks y realtime.
-- **Posts**: listado con filtros, editor Markdown, tags, portada opcional, SEO, preview y publicación.
+- **Posts**: listado con filtros, editor Markdown, tags, portada opcional, SEO y publicación (preview si entra en v1).
 - **Proyectos**: listado, editor de case study, galería, stack, estados, URLs y SEO.
 - **Tags**, **Landing**, **Settings** y **Redirects**.
 - **Media**: subida, alt, variantes y eliminación.
