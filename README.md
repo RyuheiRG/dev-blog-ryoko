@@ -24,7 +24,7 @@ La documentación de producto, diseño, contrato y arquitectura vive en [`docs/`
 ## Requisitos
 
 - Node.js 22 o superior.
-- pnpm 10 o superior.
+- pnpm 12.6.0, fijado en `package.json` con `packageManager`. No usar npm ni yarn.
 
 ## Comandos
 
