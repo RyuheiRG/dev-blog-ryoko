@@ -90,7 +90,20 @@ ryoko-platform/
 - Tailwind CSS 4 con los tokens de `docs/DESIGN.md`.
 - TanStack Query para datos remotos.
 - Zod para validar formularios y respuestas.
+- **pnpm** como package manager (no npm ni yarn); fijar `packageManager` y versionar `pnpm-lock.yaml`.
 - SPA estática desplegada en `cms.ryuheirg.dev`.
+
+### Entorno de desarrollo
+
+El owner trabaja en Windows 11 con WSL2 (Ubuntu) y Docker Desktop. `docker compose` está disponible en PowerShell; no hace falta Rancher Desktop ni instalar Docker Engine a mano.
+
+- **Python 3.12** fijado con `uv`. No usar `pip`, `sudo pip`, `uv pip install --system` ni instalaciones globales.
+- Cada servicio debe tener su `pyproject.toml`, `uv.lock` y `.venv` local; o un workspace de `uv` documentado.
+- `uv sync` crea el entorno; `uv run ...` ejecuta. `ruff`, `mypy` y `pytest` van como dependencias de desarrollo.
+- **Node/pnpm** para `apps/admin`; no npm ni yarn. Fijar `packageManager` y versionar `pnpm-lock.yaml`.
+- **Docker Compose v2** (`docker compose`), PostgreSQL 16 y Redis 7 con healthchecks y volúmenes nombrados.
+- En Dockerfiles: `uv sync --frozen --no-dev`; nunca `pip install`.
+- Incluir `.gitignore` para `.venv/`, `__pycache__/`, `.pytest_cache/`, `.mypy_cache/`, `.ruff_cache/`, `*.pyc` y `.env`; incluir `.dockerignore` y `.gitattributes` con LF para `Dockerfile`, `*.sh` y `compose`.
 
 ## 5. Content API
 
@@ -317,6 +330,7 @@ Reglas del seed:
 - [ ] Snapshot SDL de Metrics API.
 - [ ] Docker Compose con PostgreSQL y Redis.
 - [ ] `.env.example` por servicio.
+- [ ] `uv.lock` y `.python-version` versionados; `pnpm-lock.yaml` y `packageManager` en `apps/admin`.
 - [ ] Tests de contrato, auth, HMAC/replay/duplicados y métricas.
 - [ ] `/health` y `/ready` en cada servicio.
 - [ ] Admin UI funcional en `cms.ryuheirg.dev`.
@@ -342,6 +356,7 @@ Reglas del seed:
 - El seed usa los mocks actuales; no se cambian los 3 proyectos por otros.
 - El panel de administración **sí entra** en la entrega.
 - Preview de drafts y UI de programación: el schema y las tablas sí; la UI puede quedar para v1.1 si el tiempo aprieta.
+- Python se gestiona con `uv` y Node con pnpm; no se usan `pip` global, npm ni yarn.
 - Redirects reales 301 en Vercel: v1.1. En v1 se generan páginas estáticas de redirección.
 - No hay ads, comentarios, newsletter, búsqueda ni multiidioma en v1.
 - No hay endpoints de gestión de usuarios en v1.

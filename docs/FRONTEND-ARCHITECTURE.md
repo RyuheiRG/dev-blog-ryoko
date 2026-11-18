@@ -17,10 +17,12 @@
 | Package manager | pnpm | Consistencia y velocidad |
 | Deploy | Vercel | Preview deployments, dominio, deploy hook |
 
+> **Package manager: pnpm.** Es una decisión cerrada del proyecto, no una sugerencia. No usar npm ni yarn ni generar `package-lock.json` o `yarn.lock`. La versión está fijada en `package.json` con `packageManager`.
+
 ## 2. Estructura del repositorio
 
 ```text
-ryoko/
+dev-blog-ryoko/
 ├── AGENTS.md
 ├── README.md
 ├── astro.config.mjs
@@ -626,6 +628,8 @@ pnpm fetch:github
 pnpm download:media
 pnpm build:preview
 ```
+
+> Todos los comandos asumen pnpm. No ejecutar equivalentes con npm o yarn.
 
 ## 15. Variables de entorno
 

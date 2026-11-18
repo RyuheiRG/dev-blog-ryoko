@@ -60,6 +60,10 @@ docs/               # contrato y decisiones
 
 ## 4. Comandos
 
+> **Frontend: pnpm.** Es una decisión cerrada del proyecto; no usar npm ni yarn ni generar `package-lock.json` o `yarn.lock`. La versión está fijada en `package.json` con `packageManager`.
+>
+> **CMS: uv.** No usar `pip` global ni `python -m venv` manual. `uv sync` crea el `.venv` local y `uv run` ejecuta dentro de él. `ruff`, `mypy` y `pytest` son dependencias de desarrollo, no herramientas globales.
+
 ### Frontend
 
 ```bash
@@ -105,6 +109,8 @@ uv run pytest
 docker compose up --build
 ```
 
+Si el compose vive en `infra/`, ejecutar `docker compose -f infra/docker-compose.yml up --build`. Usar siempre Docker Compose v2 o superior.
+
 Si un comando no existe todavía, créalo de forma consistente con los demás y actualiza este archivo.
 
 ## 5. Convenciones de código
@@ -112,6 +118,7 @@ Si un comando no existe todavía, créalo de forma consistente con los demás y 
 ### Frontend
 
 - TypeScript estricto. No usar `any`.
+- Usar pnpm para instalar dependencias y ejecutar scripts; no npm ni yarn.
 - Astro components para todo lo estático; islas solo para interactividad real.
 - Tailwind con tokens CSS; no colores arbitrarios (`text-[#ff0000]` prohibido).
 - Nombres de componentes en PascalCase; archivos `.astro` con PascalCase.
@@ -125,6 +132,10 @@ Si un comando no existe todavía, créalo de forma consistente con los demás y 
 ### CMS
 
 - Python 3.12+.
+- Gestionar Python y dependencias con `uv`; no usar `pip` global.
+- `uv python pin 3.12`, `uv sync` para el entorno local y `uv run` para ejecutar.
+- `ruff`, `mypy` y `pytest` como dependencias de desarrollo; no instalarlas globalmente.
+- Docker Compose v2 (`docker compose`); no usar `docker-compose` v1.
 - FastAPI + Pydantic v2.
 - SQLAlchemy 2.0 async + asyncpg.
 - Alembic para migraciones.
@@ -204,9 +215,9 @@ Si un comando no existe todavía, créalo de forma consistente con los demás y 
 
 ### CMS
 
-- [ ] `pytest` pasa.
-- [ ] `ruff check` pasa.
-- [ ] `mypy` pasa.
+- [ ] `uv run pytest` pasa.
+- [ ] `uv run ruff check .` pasa.
+- [ ] `uv run mypy app` pasa.
 - [ ] Migración Alembic incluida si hay cambios de DB.
 - [ ] Tests de contrato actualizados.
 - [ ] `API-CONTRACT.md` actualizado si cambió un schema.
@@ -290,6 +301,7 @@ Si un comando no existe todavía, créalo de forma consistente con los demás y 
 - Dueño del proyecto: Ricardo Reyes Gómez (`RyuheiRG`).
 - Repo frontend: `dev-blog-ryoko`.
 - Repo CMS: `ryoko-platform`.
+- Package manager frontend: `pnpm`; Python: `uv`.
 - Documentación: `docs/`.
 - Dudas de contrato: preguntar antes de implementar.
 
