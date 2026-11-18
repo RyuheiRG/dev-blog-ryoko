@@ -1,7 +1,7 @@
 # CMS-HANDOFF.md — Brief para construir `ryoko-platform`
 
 > Handoff del frontend al agente que construirá el CMS.
-> Frontend validado en `dev-blog-ryoko@5f527d5` (rama `main`).
+> Frontend validado en `dev-blog-ryoko@03f0597` (rama `main`, pnpm 12.6.0).
 > El contrato canónico vive en [`docs/API-CONTRACT.md`](./API-CONTRACT.md). Si algo no está ahí, no lo inventes: repórtalo.
 
 ## 1. Qué vas a construir
